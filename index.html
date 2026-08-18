@@ -1,484 +1,849 @@
-from weasyprint import HTML
-
-html_content = """<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <title>Digitalización de Contratos PABS - Región Norte (Fórmula Editable y Plazas)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PABS - Programa de Apoyo de Beneficio Social Tecate</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pabs: {
+                            blue: '#002B7F',
+                            darkblue: '#001A52',
+                            lightblue: '#0056D2',
+                            red: '#E31B23',
+                            gold: '#D4AF37',
+                            lightbg: '#F4F7FC',
+                            yellowpaper: '#FEF9C3'
+                        }
+                    },
+                    fontFamily: {
+                        montserrat: ['Montserrat', 'sans-serif'],
+                        sans: ['Open Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @page {
-            size: A4;
-            margin: 10mm 8mm;
-            background-color: #ffffff;
+        .gradient-header {
+            background: linear-gradient(135deg, #001A52 0%, #002B7F 50%, #0056D2 100%);
         }
-        *, *::before, *::after {
-            box-sizing: border-box;
+        .hero-pattern {
+            background-color: #001a52;
+            background-image: radial-gradient(#0056d2 0.75px, transparent 0.75px), radial-gradient(#0056d2 0.75px, #001a52 0.75px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
         }
-        body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 8.2pt;
-            line-height: 1.2;
-            color: #111;
-            margin: 0;
-            padding: 0;
-        }
-        .contract-page {
-            page-break-after: always;
-        }
-        .contract-page:last-child {
-            page-break-after: auto;
-        }
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 6px;
-        }
-        .header-table td {
-            vertical-align: top;
-        }
-        .logo-box {
-            width: 25%;
-            font-weight: bold;
-            font-size: 10pt;
-            color: #1a365d;
-        }
-        .company-info {
-            width: 50%;
-            text-align: center;
-            font-size: 7pt;
-        }
-        .folio-box {
-            width: 25%;
-            text-align: right;
-            font-size: 8.5pt;
-            font-weight: bold;
-            color: #c53030;
-        }
-        .title-banner {
-            background-color: #1a365d;
-            color: #ffffff;
-            text-align: center;
-            font-weight: bold;
-            font-size: 9.5pt;
-            padding: 3px;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .field-tag {
-            background-color: #e2e8f0;
-            color: #2d3748;
-            font-size: 6.5pt;
-            padding: 1px 3px;
-            border-radius: 2px;
-            font-weight: normal;
-        }
-        .admin-edit-tag {
-            background-color: #fefcbf;
-            color: #744210;
-            border: 1px dashed #d69e2e;
-            font-size: 6.5pt;
-            padding: 1px 4px;
-            font-weight: bold;
-            border-radius: 2px;
-        }
-        .section-header {
-            font-weight: bold;
-            font-size: 8pt;
-            background-color: #edf2f7;
-            padding: 2px 5px;
-            border-left: 3px solid #1a365d;
-            margin-top: 5px;
-            margin-bottom: 3px;
-        }
-        p.clause {
-            text-align: justify;
-            margin: 2.5px 0;
-            font-size: 7.5pt;
-        }
-        .fill-line {
-            border-bottom: 1px solid #4a5568;
-            display: inline-block;
-            padding: 0 3px;
-            font-weight: bold;
-            color: #2b6cb0;
-        }
-        .admin-fill-line {
-            border-bottom: 1.5px solid #d69e2e;
-            background-color: #fffff0;
-            display: inline-block;
-            padding: 0 3px;
-            font-weight: bold;
-            color: #9b2c2c;
-        }
-        .services-list {
-            margin: 3px 0;
-            padding-left: 14px;
-            font-size: 7.2pt;
-        }
-        .services-list li {
-            margin-bottom: 1.5px;
-            text-align: justify;
-        }
-        .stub-box {
-            border: 1px dashed #4a5568;
-            padding: 6px;
-            margin-top: 8px;
-            background-color: #f7fafc;
-        }
-        .notice-box {
-            border: 1px solid #e2e8f0;
-            background-color: #f7fafc;
-            padding: 5px;
-            font-size: 6.8pt;
-            margin-top: 5px;
-        }
-        .signature-table {
-            width: 100%;
-            margin-top: 12px;
-            border-collapse: collapse;
-        }
-        .signature-table td {
-            width: 50%;
-            text-align: center;
-            vertical-align: bottom;
-            padding-top: 20px;
-            font-size: 7.5pt;
-        }
-        .signature-line {
-            border-top: 1px solid #1a1a1a;
-            width: 80%;
-            margin: 0 auto 3px auto;
-        }
-        .admin-panel-info {
-            background-color: #fffaf0;
-            border: 1px solid #feebc8;
-            border-left: 4px solid #dd6b20;
-            padding: 6px 8px;
-            margin-bottom: 8px;
-            font-size: 7.2pt;
-            color: #7b341e;
+        .contract-paper {
+            background-color: #fefce8;
+            border: 1px solid #fef08a;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body>
+<body class="font-sans text-gray-800 bg-slate-50 antialiased selection:bg-pabs-blue selection:text-white">
 
-    <!-- ==================== CONTRATO 1: PLAN IMPERIAL (FRENTE) ==================== -->
-    <div class="contract-page">
-        
-        <div class="admin-panel-info">
-            <strong>CONFIGURACIÓN PRIVILEGIADA DE EDICIÓN Y REGIONALIZACIÓN NORTE:</strong><br>
-            • <strong>Plazas Habilitadas (Selección Múltiple):</strong> Tecate, Tijuana, Rosarito y Ensenada. <em>(Excluida Mexicali)</em>.<br>
-            • <strong>Permiso de Edición Exclusivo (Modo Asesor / Admin):</strong> Costo Total ($ / Letra) y Campo Libre Opcional habilitados para modificación manual o condicional.
-        </div>
-
-        <table class="header-table">
-            <tr>
-                <td class="logo-box">
-                    PROGRAMA DE APOYO<br>DE BENEFICIO SOCIAL®
-                </td>
-                <td class="company-info">
-                    <strong>SERVIFUT DE PREVENCION S.A. DE C.V.</strong><br>
-                    RFC: SPR241031EG6 | Región Norte (Tecate, Tijuana, Rosarito, Ensenada)<br>
-                    Calle 13 N° 1 Int. 4, Col. Espinoza, C.P. 21410, Tecate B.C.<br>
-                    Tels. 665 655 7823 y 665 654 5457 (24Hrs.)
-                </td>
-                <td class="folio-box">
-                    FOLIO / CLAVE:<br>
-                    <span style="font-size: 13pt; color: #c53030;">EFO1 - 3427</span>
-                </td>
-            </tr>
-        </table>
-
-        <div class="title-banner">SOLICITUD CONTRATO PLAN IMPERIAL</div>
-
-        <p class="clause">
-            En la ciudad de <span class="fill-line">[ Plaza: Tecate | Tijuana | Rosarito | Ensenada ]</span>, B.C. a los <span class="fill-line">[ Día ]</span> días del mes de <span class="fill-line">[ Mes ]</span> del <span class="fill-line">[ Año ]</span> comparecen por una parte <strong>SERVIFUT DE PREVENCION S.A. DE C.V.</strong> con domicilio en Calle 13 N° 1 Int. 4, Col. Espinoza, C.P. 21410 en adelante la empresa y por la otra <span class="fill-line">[ Nombre completo del Titular / Cliente ]</span> con domicilio en <span class="fill-line">[ Domicilio completo ]</span> estado civil <span class="fill-line">[ Estado Civil ]</span> en su calidad de titular - cliente, manifestando ambas partes su conformidad para celebrar un contrato de prestación de servicios funerarios bajo las siguientes declaraciones y cláusulas:
-        </p>
-
-        <div class="section-header">DECLARACIONES:</div>
-        <p class="clause"><strong>DECLARA LA EMPRESA:</strong> Ser una persona moral, que su actividad económica es la de proveer servicios funerarios a previsión de gran calidad al alcance de todos y que la persona que firme el presente contrato en su representación tiene la facultad legal suficiente para hacerlo.</p>
-        <p class="clause"><strong>DECLARA EL CLIENTE:</strong> Ser mayor de edad y que es su voluntad contratar de la empresa, los servicios funerarios a previsión descritos en las siguientes:</p>
-
-        <div class="section-header">CLÁUSULAS:</div>
-        <p class="clause"><strong>PRIMERA.- PLANES FUNERARIOS, ADQUISICIÓN DEL PLAN.-</strong> A través de la firma del presente contrato, el "Titular" acepta estar adquiriendo el <strong>PLAN IMPERIAL</strong> con el que cuenta la empresa.</p>
-        <p class="clause"><strong>SEGUNDA.- DERECHOS DEL CONTRATO.-</strong> De conformidad al plan contratado, el CLIENTE es la única persona que se reconoce como "Titular" del contrato y quien recibe todos los beneficios aquí mencionados.</p>
-        <p class="clause">La prestación de los servicios funerarios materia de este contrato puede ser transferida a persona distinta al "Titular" a petición expresa por escrito de este. En el entendido de que únicamente el "Titular" podrá ser quién autorice transferir su servicio.</p>
-        <p class="clause">En caso de muerte o incapacidad del "Titular" que le impida cumplir con las obligaciones del presente contrato, al momento de ser requerido el servicio se deberán cubrir los importes que no hayan sido pagados, pudiendo la empresa solicitarlo a la persona que solicite el servicio.</p>
-
-        <p class="clause">
-            <strong>TERCERA.- COSTO TOTAL Y APORTACIONES.-</strong> El valor total de este contrato es de 
-            <span class="admin-fill-line">$ [ EDITABLE ADMIN: Costo Total Numérico ]</span> 
-            (<span class="admin-fill-line">[ EDITABLE ADMIN: Costo Total en Letra ]</span>) 
-            que acepta cubrir, con un pago inicial de <span class="fill-line">$ [ Pago Inicial ]</span> y pagos de <span class="fill-line">$ [ Parcialidad ]</span> a cubrir de manera <span class="fill-line">[ Frecuencia: Semanal / Quincenal / Mensual ]</span>, sin cargo de intereses en nuestras oficinas autorizadas para recibir aportaciones.
-            <span class="admin-edit-tag">🔒 CAMPO PRIVADO EDITABLE SOLO POR ASESOR / ADMIN</span>
-        </p>
-        
-        <p class="clause">
-            <strong>OBSERVACIONES / CONDICIONES ESPECIALES EXCLUSIVAS:</strong><br>
-            <span class="admin-fill-line" style="width: 98%; min-height: 16px;">[ OPCIÓN LIBRE EDITABLE EXCLUSIVA PARA SERGIO / ADMIN: Convenios, promociones especiales, ajustes de cobertura o notas del ejecutivo ]</span>
-        </p>
-
-        <p class="clause">El "Titular" acuerda que los abonos efectuados a este contrato serán a favor exclusivo del presente compromiso aquí establecido, acordando que no podrá ser utilizado para traspasar o dividir lo que llevara abonado a un contrato distinto al presente, salvo en caso de solicitar el cambio a un contrato de costo mayor, para ello deberá de estar al corriente con sus aportaciones.</p>
-        <p class="clause">Para los casos de aclaraciones, confirmaciones y otros referentes con su saldo, el "Titular" deberá mostrar sus recibos originales por lo que la EMPRESA desconoce toda aportación realizada en cualquier tipo de documento diferente al recibo de cobro original de la EMPRESA.</p>
-
-        <p class="clause"><strong>CUARTA.- SEGURO POR MUERTE ACCIDENTAL INSTANTÁNEA.-</strong> La EMPRESA se compromete a otorgar un "seguro por muerte accidental instantánea", para el caso de que el "Titular" falleciera accidentalmente y de manera instantánea en el evento; comprometiéndose la EMPRESA a prestar el servicio aquí contratado quedando automáticamente liquidado el saldo que corresponda al costo del Plan utilizado, además de hacerse responsable del trámite y pago por los honorarios gubernamentales que se generen.</p>
-
-        <p class="clause"><strong>QUINTA.- PAGO AL MOMENTO DE REQUERIR UN SERVICIO.-</strong> Si el servicio contenido en este contrato fuera requerido antes de haber sido cubierto su importe totalmente, el SOLICITANTE está conforme que para poder hacer uso del mismo, deberá de CUBRIR o SALDAR el costo total del servicio solicitado.</p>
-
-        <div style="text-align: right; font-size: 7.2pt; font-style: italic; margin-top: 3px;">CONTINUA AL REVERSO</div>
-
-        <!-- TALÓN DE INVERSIÓN INICIAL -->
-        <div class="stub-box">
-            <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                    <td style="width: 30%;"><strong style="color: #1a365d;">PROGRAMA DE APOYO DE BENEFICIO SOCIAL®</strong></td>
-                    <td style="width: 45%; font-size: 6.8pt; text-align: center;">
-                        <strong>SERVIFUT DE PREVENCION S.A. DE C.V.</strong><br>
-                        Región Norte: Tecate | Tijuana | Rosarito | Ensenada<br>
-                        Calle 13 N° 1 Int. 4, Col. Espinoza, C.P. 21410, Tecate B.C.
-                    </td>
-                    <td style="width: 25%; text-align: right; font-weight: bold; color: #c53030;">
-                        FOLIO RECIBO:<br>EFO1 - 3427
-                    </td>
-                </tr>
-            </table>
-            <div style="margin-top: 4px; font-size: 7.5pt;">
-                Plaza: <span class="fill-line" style="width: 25%;">[ Tecate / Tijuana / Rosarito / Ensenada ]</span> | Fecha: <span class="fill-line" style="width: 20%;">[ Fecha ]</span><br>
-                Recibí de: <span class="fill-line" style="width: 70%;">[ Nombre del Cliente ]</span><br>
-                La cantidad de: <span class="fill-line" style="width: 35%;">$ [ Monto Inicial ]</span> Por concepto de: <span class="fill-line" style="width: 30%;">INVERSIÓN INICIAL</span><br>
-                Cantidad con Letra: <span class="fill-line" style="width: 80%;">[ Monto en Letra ]</span>
+    <!-- Top Alert / Contact Bar -->
+    <div class="bg-pabs-darkblue text-white text-xs sm:text-sm py-2 px-4 border-b border-blue-900">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center gap-4 text-center sm:text-left">
+                <span><i class="fa-solid fa-clock text-pabs-gold mr-1"></i> Atención de Emergencias 24/7 en Tecate, B.C.</span>
+                <span class="hidden md:inline"><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> RFC: SPR241031EG6</span>
             </div>
-            <table class="signature-table" style="margin-top: 6px;">
-                <tr>
-                    <td>
-                        <div class="signature-line"></div>
-                        RECIBÍ (FIRMA AUTORIZADA PABS)
-                    </td>
-                    <td>
-                        <div class="signature-line"></div>
-                        ORIGINAL CLIENTE
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <!-- ==================== CONTRATO 1: PLAN IMPERIAL (REVERSO) ==================== -->
-    <div class="contract-page">
-        <div class="section-header">CLÁUSULAS (CONTINUACIÓN - REVERSO):</div>
-
-        <p class="clause">En el supuesto de que los abonos pactados no se cubran oportunamente y exista un atraso acumulado de 30 días, de acuerdo a lo established en la CLÁUSULA TERCERA, se dará por terminado el acuerdo de pago a plazos, conviniendo ambas partes que la cantidad que se haya entregado quede como depósito a favor del "Titular", a cuenta del servicio funerario que pudiese requerir el Titular a futuro.</p>
-
-        <p class="clause"><strong>SEXTA.- PRESTACIÓN DE LOS SERVICIOS.-</strong> El servicio funerario que se proporciona al "Titular" será por conducto de "Latinoamericana Recinto Funerario" con Domicilio en Blvd. Defensores de Baja California N° 470 Col. Downey y/o filiales establecidas en el país, con horario establecido las 24 horas del día los 365 días del año, tales servicios consisten en:</p>
-        
-        <ol type="a" class="services-list">
-            <li>Levantamiento de la persona fallecida desde cualquier unidad médica o domicilio particular en los municipios de la Región Norte (Tecate, Tijuana, Rosarito, Ensenada).</li>
-            <li>Servicio de preparación e higienización.</li>
-            <li>Servicio de carroza de lujo para el traslado de la persona fallecida al cementerio.</li>
-            <li>Servicio de cafetería Gourmet QUE INCLUYE: café expreso, capuchino, americano, té, galletas, brownies y refresco.</li>
-            <li>Arreglo estético para velación (no incluye Embalsamación).</li>
-            <li>Asesoría en trámites de defunción.</li>
-            <li>Gestoría en trámites de defunción (No incluye costos de Impuestos Municipales y Estatales).</li>
-            <li>Cien esquelas personalizadas (Recuerdos familiares).</li>
-            <li>Libro de Registro.</li>
-            <li>Ataúd de madera de lujo Modelo Premium.</li>
-            <li>Servicio de cremación opcional (No incluye el pago por permiso de cremación).</li>
-            <li>Ataúd de madera de lujo para uso exclusivo de velación (en caso de cremación).</li>
-            <li>Una urna modelo Imperial (Solo en servicio de cremación).</li>
-            <li>Internet inalámbrico en capilla.</li>
-            <li>Maquillaje profesional de la persona fallecida.</li>
-            <li>Seguro por muerte accidental instantánea.</li>
-            <li>Trámite y pago de honorarios gubernamentales en caso de muerte accidental instantánea.</li>
-            <li>Crucifijo memorial PABS®.</li>
-            <li>Servicio de transmisión de velación virtual vía internet.</li>
-            <li>Acompañamiento musical religioso en capilla.</li>
-            <li>Primera sesión del Taller de Tanatología sin costo.</li>
-            <li>Cobertura en la red nacional que integran las diferentes filiales del Programa de Apoyo de Beneficio Social®.</li>
-        </ol>
-
-        <p class="clause"><strong>SÉPTIMA.- SERVICIOS ADICIONALES.-</strong> Se podrán solicitar servicios adicionales, mismos que serán prestados por conducto de "Latinoamericana Recinto Funerario" y red Nacional de Funerarias afiliadas, cobrados por separado cuando excedan el radio de cobertura asignado.</p>
-        <p class="clause"><strong>OCTAVA.- HACER USO DE LOS SERVICIOS.-</strong> Para hacer efectivo el servicio contratado, el titular y/o solicitante deberá presentarse personalmente en las instalaciones correspondientes con la documentación requerida.</p>
-        <p class="clause"><strong>NOVENA.- BENEFICIO EN CAMBIO DE URNA O ATAÚD.-</strong> Por ser afiliado al Programa de Apoyo de Beneficio Social® podrá ser acreedor de hasta un 50% de descuento al solicitar modelos de categoría superior.</p>
-        <p class="clause"><strong>DÉCIMA.- VIGENCIA.-</strong> La vigencia de este contrato termina con la prestación de la totalidad del servicio funerario contratado.</p>
-        <p class="clause"><strong>DÉCIMA PRIMERA.- CANCELACIÓN.-</strong> Plazo de cinco días hábiles en base a la NOM-36-SCFI-2007.</p>
-
-        <p class="clause">Ambas partes firman por duplicado en la plaza de <span class="fill-line">[ Tecate | Tijuana | Rosarito | Ensenada ]</span>, B.C.</p>
-
-        <p class="clause"><strong>DÉCIMA SEGUNDA.- DESIGNACIÓN DE BENEFICIARIO.-</strong></p>
-        <div style="margin: 6px 0; font-size: 7.5pt;">
-            Beneficiario: <span class="fill-line" style="width: 50%;">[ Nombre Completo del Beneficiario ]</span><br>
-            Parentesco / Teléfono: <span class="fill-line" style="width: 45%;">[ Parentesco ] / [ Teléfono ]</span>
-        </div>
-
-        <table class="signature-table">
-            <tr>
-                <td>
-                    <div class="signature-line"></div>
-                    Titular (Firma)
-                </td>
-                <td>
-                    <div class="signature-line"></div>
-                    La Empresa (Firma Autorizada)
-                </td>
-            </tr>
-        </table>
-
-        <div class="notice-box" style="margin-top: 10px;">
-            <strong>Condiciones de Activación:</strong> Inicio de vigencia tras la llamada de confirmación de PABS.
-        </div>
-        <div style="text-align: right; font-size: 6.5pt; margin-top: 4px; color: #718096;">Código de Formato: TKT-108-0225-NORTE</div>
-    </div>
-
-    <!-- ==================== CONTRATO 2: PLAN PREMIUM (FRENTE) ==================== -->
-    <div class="contract-page">
-
-        <div class="admin-panel-info">
-            <strong>CONFIGURACIÓN PRIVILEGIADA DE EDICIÓN Y REGIONALIZACIÓN NORTE:</strong><br>
-            • <strong>Plazas Habilitadas (Selección Múltiple):</strong> Tecate, Tijuana, Rosarito y Ensenada. <em>(Excluida Mexicali)</em>.<br>
-            • <strong>Permiso de Edición Exclusivo (Modo Asesor / Admin):</strong> Costo Total ($ / Letra) y Campo Libre Opcional habilitados para modificación manual o condicional.
-        </div>
-
-        <table class="header-table">
-            <tr>
-                <td class="logo-box">
-                    PROGRAMA DE APOYO<br>DE BENEFICIO SOCIAL®
-                </td>
-                <td class="company-info">
-                    <strong>SERVIFUT DE PREVENCION S.A. DE C.V.</strong><br>
-                    RFC: SPR241031EG6 | Región Norte (Tecate, Tijuana, Rosarito, Ensenada)<br>
-                    Calle 13 N° 1 Int. 4, Col. Espinoza, C.P. 21410, Tecate B.C.<br>
-                    Tels. 665 655 7823 y 665 654 5457 (24Hrs.)
-                </td>
-                <td class="folio-box">
-                    FOLIO / CLAVE:<br>
-                    <span style="font-size: 13pt; color: #c53030;">EFO2 - 0681</span>
-                </td>
-            </tr>
-        </table>
-
-        <div class="title-banner">SOLICITUD CONTRATO PLAN PREMIUM</div>
-
-        <p class="clause">
-            En la ciudad de <span class="fill-line">[ Plaza: Tecate | Tijuana | Rosarito | Ensenada ]</span>, B.C. a los <span class="fill-line">[ Día ]</span> días del mes de <span class="fill-line">[ Mes ]</span> del <span class="fill-line">[ Año ]</span> comparecen por una parte <strong>SERVIFUT DE PREVENCION S.A. DE C.V.</strong> con domicilio en Calle 13 N° 1 Int. 4, Col. Espinoza, C.P. 21410 en adelante la empresa y por la otra <span class="fill-line">[ Nombre del Titular ]</span> con domicilio en <span class="fill-line">[ Domicilio completo ]</span> estado civil <span class="fill-line">[ Estado Civil ]</span> en su calidad de titular - cliente, manifestando ambas partes su conformidad para celebrar un contrato de prestación de servicios funerarios bajo las siguientes declaraciones y cláusulas:
-        </p>
-
-        <div class="section-header">DECLARACIONES:</div>
-        <p class="clause"><strong>DECLARA LA EMPRESA:</strong> Ser una persona moral, que su actividad económica es la de proveer servicios funerarios a previsión de gran calidad al alcance de todos y que la persona que firme el presente contrato en su representación tiene la facultad legal suficiente para hacerlo.</p>
-        <p class="clause"><strong>DECLARA EL CLIENTE:</strong> Ser mayor de edad y que es su voluntad contratar de la empresa, los servicios funerarios a previsión descritos en las siguientes:</p>
-
-        <div class="section-header">CLÁUSULAS:</div>
-        <p class="clause"><strong>PRIMERA.- PLANES FUNERARIOS, ADQUISICIÓN DEL PLAN.-</strong> A través de la firma del presente contrato, el "Titular" acepta estar adquiriendo el <strong>PLAN PREMIUM</strong> con el que cuenta la empresa.</p>
-        <p class="clause"><strong>SEGUNDA.- DERECHOS DEL CONTRATO.-</strong> De conformidad al plan contratado, el CLIENTE es la única persona que se reconoce como "Titular" del contrato y quien recibe todos los beneficios aquí mencionados.</p>
-
-        <p class="clause">
-            <strong>TERCERA.- COSTO TOTAL Y APORTACIONES.-</strong> El valor total de este contrato es de 
-            <span class="admin-fill-line">$ [ EDITABLE ADMIN: Costo Total Numérico ]</span> 
-            (<span class="admin-fill-line">[ EDITABLE ADMIN: Costo Total en Letra ]</span>) 
-            que acepta cubrir, con un pago inicial de <span class="fill-line">$ [ Pago Inicial ]</span> y pagos de <span class="fill-line">$ [ Parcialidad ]</span> a cubrir de manera <span class="fill-line">[ Frecuencia ]</span>, sin cargo de intereses en nuestras oficinas autorizadas para recibir aportaciones.
-            <span class="admin-edit-tag">🔒 CAMPO PRIVADO EDITABLE SOLO POR ASESOR / ADMIN</span>
-        </p>
-
-        <p class="clause">
-            <strong>OBSERVACIONES / CONDICIONES ESPECIALES EXCLUSIVAS:</strong><br>
-            <span class="admin-fill-line" style="width: 98%; min-height: 16px;">[ OPCIÓN LIBRE EDITABLE EXCLUSIVA PARA SERGIO / ADMIN: Convenios, promociones especiales, ajustes de cobertura o notas del ejecutivo ]</span>
-        </p>
-
-        <p class="clause"><strong>CUARTA.- SEGURO POR MUERTE ACCIDENTAL INSTANTÁNEA.-</strong> La EMPRESA se compromete a otorgar un "seguro por muerte accidental instantánea", para el caso de que el "Titular" falleciera accidentalmente y de manera instantánea en el evento; comprometiéndose la EMPRESA a prestar el servicio aquí contratado quedando automáticamente liquidado el saldo que corresponda al costo del Plan utilizado.</p>
-
-        <p class="clause"><strong>QUINTA.- PAGO AL MOMENTO DE REQUERIR UN SERVICIO.-</strong> Si el servicio contenido en este contrato fuera requerido antes de haber sido cubierto su importe totalmente, el SOLICITANTE está conforme que para poder hacer uso del mismo, deberá de CUBRIR o SALDAR el costo total del servicio solicitado.</p>
-
-        <div style="text-align: right; font-size: 7.2pt; font-style: italic; margin-top: 3px;">CONTINUA AL REVERSO</div>
-
-        <!-- TALÓN DE INVERSIÓN INICIAL -->
-        <div class="stub-box">
-            <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                    <td style="width: 30%;"><strong style="color: #1a365d;">PROGRAMA DE APOYO DE BENEFICIO SOCIAL®</strong></td>
-                    <td style="width: 45%; font-size: 6.8pt; text-align: center;">
-                        <strong>SERVIFUT DE PREVENCION S.A. DE C.V.</strong><br>
-                        Región Norte: Tecate | Tijuana | Rosarito | Ensenada<br>
-                        Calle 13 N° 1 Int. 4, Col. Espinoza, C.P. 21410, Tecate B.C.
-                    </td>
-                    <td style="width: 25%; text-align: right; font-weight: bold; color: #c53030;">
-                        FOLIO RECIBO:<br>EFO2 - 0681
-                    </td>
-                </tr>
-            </table>
-            <div style="margin-top: 4px; font-size: 7.5pt;">
-                Plaza: <span class="fill-line" style="width: 25%;">[ Tecate / Tijuana / Rosarito / Ensenada ]</span> | Fecha: <span class="fill-line" style="width: 20%;">[ Fecha ]</span><br>
-                Recibí de: <span class="fill-line" style="width: 70%;">[ Nombre del Cliente ]</span><br>
-                La cantidad de: <span class="fill-line" style="width: 35%;">$ [ Monto Inicial ]</span> Por concepto de: <span class="fill-line" style="width: 30%;">INVERSIÓN INICIAL</span><br>
-                Cantidad con Letra: <span class="fill-line" style="width: 80%;">[ Monto en Letra ]</span>
+            <div class="flex items-center gap-4">
+                <a href="tel:6656557823" class="hover:text-pabs-gold transition"><i class="fa-solid fa-phone text-xs mr-1"></i> (665) 655-7823</a>
+                <a href="https://wa.me/526641601608" target="_blank" class="hover:text-emerald-400 font-semibold transition"><i class="fa-brands fa-whatsapp text-emerald-400 text-sm mr-1"></i> 664 160 1608</a>
             </div>
-            <table class="signature-table" style="margin-top: 6px;">
-                <tr>
-                    <td>
-                        <div class="signature-line"></div>
-                        RECIBÍ (FIRMA AUTORIZADA)
-                    </td>
-                    <td>
-                        <div class="signature-line"></div>
-                        ORIGINAL CLIENTE
-                    </td>
-                </tr>
-            </table>
         </div>
     </div>
 
-    <!-- ==================== CONTRATO 2: PLAN PREMIUM (REVERSO) ==================== -->
-    <div class="contract-page">
-        <div class="section-header">CLÁUSULAS (CONTINUACIÓN - REVERSO):</div>
+    <!-- Main Navigation Header -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-24">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-3 group">
+                    <img src="Logo pabs.webp" alt="PABS Logo" class="h-16 sm:h-20 w-auto object-contain transition transform group-hover:scale-105">
+                    <div class="hidden sm:block border-l-2 border-gray-200 pl-3">
+                        <span class="block font-montserrat font-bold text-pabs-blue text-lg leading-tight">PABS</span>
+                        <span class="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Programa de Apoyo<br>de Beneficio Social</span>
+                    </div>
+                </a>
 
-        <p class="clause"><strong>SEXTA.- PRESTACIÓN DE LOS SERVICIOS.-</strong> El servicio funerario que se proporciona al "Titular" será por conducto de "Latinoamericana Recinto Funerario" con Domicilio en Blvd. Defensores de Baja California N° 470 Col. Downey y/o filiales establecidas en la Región Norte (Tecate, Tijuana, Rosarito, Ensenada).</p>
-        
-        <ol type="a" class="services-list">
-            <li>Levantamiento de la persona fallecida en el municipio correspondiente.</li>
-            <li>Servicio de preparación e higienización.</li>
-            <li>Servicio de carroza de lujo.</li>
-            <li>Servicio de cafetería Premium (café expreso, capuchino, té, galletas, brownies, refrescos).</li>
-            <li>Arreglo estético para velación.</li>
-            <li>Asesoría y gestoría en trámites de defunción.</li>
-            <li>Cien esquelas personalizadas.</li>
-            <li>Libro de Registro.</li>
-            <li>Ataúd de madera de lujo Modelo Premium.</li>
-            <li>Servicio de cremación opcional.</li>
-            <li>Ataúd de velación y Urna Premium.</li>
-            <li>Maquillaje profesional.</li>
-            <li>Seguro por muerte accidental instantánea.</li>
-            <li>Crucifijo memorial PABS®, transmisión virtual y tanatología.</li>
-        </ol>
+                <!-- Navigation Links -->
+                <nav class="hidden lg:flex items-center space-x-8 text-sm font-semibold text-gray-700">
+                    <a href="#planes" class="hover:text-pabs-blue transition py-1">Planes Funerarios</a>
+                    <a href="#comparativa" class="hover:text-pabs-blue transition py-1">Coberturas</a>
+                    <a href="#solicitud" class="hover:text-pabs-blue transition py-1">Afiliación Digital</a>
+                    <a href="#beneficios" class="hover:text-pabs-blue transition py-1">Beneficios</a>
+                    <a href="#contacto" class="hover:text-pabs-blue transition py-1">Contacto</a>
+                </nav>
 
-        <p class="clause">Ambas partes firman por duplicado en la plaza de <span class="fill-line">[ Tecate | Tijuana | Rosarito | Ensenada ]</span>, B.C.</p>
-
-        <p class="clause"><strong>DÉCIMA SEGUNDA.- DESIGNACIÓN DE BENEFICIARIO.-</strong></p>
-        <div style="margin: 6px 0; font-size: 7.5pt;">
-            Beneficiario: <span class="fill-line" style="width: 50%;">[ Nombre Completo del Beneficiario ]</span><br>
-            Parentesco / Teléfono: <span class="fill-line" style="width: 45%;">[ Parentesco ] / [ Teléfono ]</span>
+                <!-- Action Button -->
+                <div class="flex items-center gap-3">
+                    <a href="#solicitud" class="bg-pabs-red hover:bg-red-700 text-white font-montserrat font-bold text-xs sm:text-sm px-4 sm:px-6 py-2.5 sm:py-3 rounded-full shadow-lg hover:shadow-red-500/30 transition transform hover:-translate-y-0.5 flex items-center gap-2">
+                        <i class="fa-solid fa-file-signature"></i>
+                        <span>Solicitar Plan</span>
+                    </a>
+                </div>
+            </div>
         </div>
+    </header>
 
-        <table class="signature-table">
-            <tr>
-                <td>
-                    <div class="signature-line"></div>
-                    Titular (Firma)
-                </td>
-                <td>
-                    <div class="signature-line"></div>
-                    La Empresa (Firma Autorizada)
-                </td>
-            </tr>
-        </table>
-        <div style="text-align: right; font-size: 6.5pt; margin-top: 8px; color: #718096;">Código de Formato: TKT-109-0225-NORTE</div>
-    </div>
+    <!-- Hero Section -->
+    <section class="relative hero-pattern text-white overflow-hidden py-16 lg:py-24">
+        <div class="absolute inset-0 bg-gradient-to-r from-pabs-darkblue/95 via-pabs-blue/90 to-blue-900/80"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-12 gap-12 items-center">
+                
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs sm:text-sm font-medium">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        SERVIFUT DE PREVENCIÓN S.A. DE C.V. - Tecate, B.C.
+                    </div>
+                    
+                    <h1 class="font-montserrat font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-tight leading-none text-white">
+                        Protección Familiar y <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-200 to-white">Previsión Funeraria</span> Sin Cargas Futuras
+                    </h1>
+                    
+                    <p class="text-base sm:text-lg text-blue-100 max-w-2xl font-normal leading-relaxed">
+                        Asegura la tranquilidad de tus seres queridos hoy mismo. Contratos con <strong>aportaciones congeladas</strong>, <strong>sin caducidad</strong>, <strong>100% transferibles</strong> y cobertura nacional en nuestra red de recintos funerarios.
+                    </p>
 
+                    <!-- Key Badges -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                        <div class="bg-white/10 backdrop-blur-md border border-white/10 p-3 rounded-xl text-center">
+                            <i class="fa-solid fa-shield-heart text-pabs-gold text-2xl mb-1"></i>
+                            <div class="text-xs font-bold uppercase tracking-wide text-white">Muerte Accidental</div>
+                            <div class="text-[10px] text-blue-200">Seguro Instantáneo</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md border border-white/10 p-3 rounded-xl text-center">
+                            <i class="fa-solid fa-infinity text-pabs-gold text-2xl mb-1"></i>
+                            <div class="text-xs font-bold uppercase tracking-wide text-white">Sin Caducidad</div>
+                            <div class="text-[10px] text-blue-200">Vigencia Perpetua</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md border border-white/10 p-3 rounded-xl text-center">
+                            <i class="fa-solid fa-people-arrows text-pabs-gold text-2xl mb-1"></i>
+                            <div class="text-xs font-bold uppercase tracking-wide text-white">100% Transferible</div>
+                            <div class="text-[10px] text-blue-200">A quien decidas</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md border border-white/10 p-3 rounded-xl text-center">
+                            <i class="fa-solid fa-globe-americas text-pabs-gold text-2xl mb-1"></i>
+                            <div class="text-xs font-bold uppercase tracking-wide text-white">Red Nacional</div>
+                            <div class="text-[10px] text-blue-200">En todo México</div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <a href="#solicitud" class="bg-emerald-500 hover:bg-emerald-600 text-white font-montserrat font-bold text-base px-8 py-4 rounded-xl shadow-xl hover:shadow-emerald-500/30 transition transform hover:-translate-y-1 text-center flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            Llenar Solicitud Digital
+                        </a>
+                        <a href="https://wa.me/526641601608?text=Hola,%20deseo%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20Planes%20PABS%20Tecate" target="_blank" class="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-montserrat font-bold text-base px-6 py-4 rounded-xl backdrop-blur-md transition text-center flex items-center justify-center gap-3">
+                            <i class="fa-brands fa-whatsapp text-emerald-400 text-xl"></i>
+                            WhatsApp 664 160 1608
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hero Interactive Card Preview -->
+                <div class="lg:col-span-5">
+                    <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 text-gray-800 border-t-8 border-pabs-blue relative">
+                        <div class="flex items-center justify-between border-b pb-4 mb-4">
+                            <div class="flex items-center gap-3">
+                                <img src="Logo pabs.webp" alt="PABS" class="h-10 w-auto">
+                                <div>
+                                    <h3 class="font-montserrat font-bold text-pabs-blue text-sm uppercase">PABS Tecate</h3>
+                                    <p class="text-xs text-gray-500">Módulos de Atención Inmediata</p>
+                                </div>
+                            </div>
+                            <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-300">
+                                Oficial
+                            </span>
+                        </div>
+
+                        <div class="space-y-4 text-sm">
+                            <div class="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                <span class="text-xs text-pabs-blue font-bold uppercase block mb-1">Módulo Tecate B.C.</span>
+                                <p class="text-xs text-gray-600"><i class="fa-solid fa-location-dot text-pabs-red mr-1"></i> Calle 13 N° 1 Int. 4, Col. Espinoza, C.P. 21410</p>
+                                <p class="text-xs text-gray-600 mt-1"><i class="fa-solid fa-envelope text-pabs-blue mr-1"></i> pabsindustrialtecate@gmail.com</p>
+                            </div>
+
+                            <div class="border-t border-b py-3 space-y-2">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-500">Oficinas Tecate:</span>
+                                    <span class="font-bold text-gray-800">(665) 655-7823 / 654-5457</span>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-500">Atención Directa WhatsApp:</span>
+                                    <span class="font-bold text-emerald-600">(664) 160-1608</span>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-500">Modalidad de pago:</span>
+                                    <span class="font-bold text-pabs-blue">Aportaciones periódicas congeladas</span>
+                                </div>
+                            </div>
+
+                            <a href="#solicitud" class="w-full bg-pabs-blue hover:bg-pabs-darkblue text-white font-montserrat font-bold py-3 rounded-lg text-center block text-xs tracking-wider uppercase transition shadow-md">
+                                Calcular mi Aportación
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Plans Comparison Section (Premium vs Imperial/Básico) -->
+    <section id="planes" class="py-20 bg-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-pabs-blue font-montserrat font-bold text-sm tracking-widest uppercase bg-blue-100 px-3 py-1 rounded-full">Nuestros Planes De Previsión</span>
+                <h2 class="font-montserrat font-extrabold text-3xl sm:text-4xl text-gray-900 mt-3">
+                    Elige el Plan que Mejor se Adapte a Tu Familia
+                </h2>
+                <p class="text-gray-600 mt-3 text-base">
+                    Extraído directamente de nuestras cláusulas oficiales. Cobertura integral desde la primera aportación con seguro de muerte accidental instantánea.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 items-stretch">
+                
+                <!-- PLAN PREMIUM -->
+                <div class="bg-white rounded-2xl shadow-xl border-2 border-pabs-blue overflow-hidden flex flex-col relative transition transform hover:-translate-y-1">
+                    <div class="bg-gradient-to-r from-pabs-darkblue to-pabs-blue text-white p-6 sm:p-8 text-center relative">
+                        <span class="absolute top-4 right-4 bg-pabs-gold text-slate-900 font-extrabold text-xs px-3 py-1 rounded-full uppercase shadow">
+                            Máxima Cobertura
+                        </span>
+                        <h3 class="font-montserrat font-extrabold text-2xl sm:text-3xl text-white">PLAN PREMIUM</h3>
+                        <p class="text-blue-200 text-xs sm:text-sm mt-1">Solicitud Contrato Plan Premium (Oficial PABS)</p>
+                        <div class="mt-4 pt-4 border-t border-blue-400/30">
+                            <span class="text-xs text-blue-200 uppercase font-semibold">Incluye Experiencia Gourmet y Lujo</span>
+                        </div>
+                    </div>
+
+                    <div class="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-6">
+                        <ul class="space-y-3.5 text-sm text-gray-700">
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-circle-check text-emerald-500 text-lg mt-0.5"></i>
+                                <span><strong>Ataúd de Madera / Metal Lujo Modelo Premium:</strong> Diseño exclusivo de alta gama.</span>
+                            </li>
+                            <li class="flex items-start gap-3 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+                                <i class="fa-solid fa-mug-hot text-amber-600 text-lg mt-0.5"></i>
+                                <span><strong>Servicio Cafetería Gourmet Exclusiva:</strong> Incluye café espresso, capuchino, americano, variedad de té, galletas, brownies y refresco.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-van-shuttle text-pabs-blue text-lg mt-0.5"></i>
+                                <span><strong>Carroza Premium:</strong> Traslado elegante desde cualquier unidad médica o domicilio particular en el municipio.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-fire text-pabs-blue text-lg mt-0.5"></i>
+                                <span><strong>Cremación Opcional Incluida:</strong> Incluye ataúd de velación (metálico o madera de lujo premium).</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-heart-pulse text-pabs-red text-lg mt-0.5"></i>
+                                <span><strong>Primera Sesión de Tanatología SIN COSTO:</strong> Acompañamiento emotivo y psicológico para la familia.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-shield-halved text-emerald-600 text-lg mt-0.5"></i>
+                                <span><strong>Seguro por Muerte Accidental Instantánea:</strong> Cubre el saldo pendiente en su totalidad conforme a cláusulas.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-wifi text-pabs-blue text-lg mt-0.5"></i>
+                                <span><strong>Transmisión Virtual Vía Internet & Wi-Fi:</strong> Para familiares a distancia en capilla.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-book-open text-pabs-blue text-lg mt-0.5"></i>
+                                <span><strong>100 Esquelas Personalizadas + Libro de Registro:</strong> Recuerdos familiares impresos de calidad.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-music text-pabs-blue text-lg mt-0.5"></i>
+                                <span><strong>Acompañamiento Musical Religioso:</strong> En capilla de velación.</span>
+                            </li>
+                        </ul>
+
+                        <div class="pt-4 border-t">
+                            <button onclick="seleccionarPlan('Plan Premium')" class="w-full bg-pabs-blue hover:bg-pabs-darkblue text-white font-montserrat font-bold py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                                <span>Seleccionar Plan Premium</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PLAN IMPERIAL / BÁSICO -->
+                <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col relative transition transform hover:-translate-y-1">
+                    <div class="bg-slate-800 text-white p-6 sm:p-8 text-center relative">
+                        <span class="absolute top-4 right-4 bg-slate-600 text-white text-xs px-3 py-1 rounded-full uppercase">
+                            Plan Esencial
+                        </span>
+                        <h3 class="font-montserrat font-extrabold text-2xl sm:text-3xl text-white">PLAN IMPERIAL / BÁSICO</h3>
+                        <p class="text-slate-300 text-xs sm:text-sm mt-1">Solicitud Contrato Plan Imperial (Oficial PABS)</p>
+                        <div class="mt-4 pt-4 border-t border-slate-700">
+                            <span class="text-xs text-slate-300 uppercase font-semibold">Protección Integral de Gran Calidad</span>
+                        </div>
+                    </div>
+
+                    <div class="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-6">
+                        <ul class="space-y-3.5 text-sm text-gray-700">
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-circle-check text-emerald-500 text-lg mt-0.5"></i>
+                                <span><strong>Ataúd de Madera o Metálico Modelo Imperial:</strong> Excelente acabado tradicional.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-mug-hot text-gray-500 text-lg mt-0.5"></i>
+                                <span><strong>Servicio de Cafetería Tradicional:</strong> Incluye café, galletas, refrescos y agua embotellada en capilla.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-van-shuttle text-gray-600 text-lg mt-0.5"></i>
+                                <span><strong>Servicio de Carroza para el Traslado:</strong> Atención rápida desde unidades médicas o domicilio.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-fire text-gray-600 text-lg mt-0.5"></i>
+                                <span><strong>Servicio de Cremación Opcional:</strong> Adaptable a la voluntad del titular o beneficiario.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-user-tie text-gray-600 text-lg mt-0.5"></i>
+                                <span><strong>Homenaje en Capilla con Director Ceremonial:</strong> Fotografía memorial del finado y discurso ceremonial.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-shield-halved text-emerald-600 text-lg mt-0.5"></i>
+                                <span><strong>Seguro por Muerte Accidental Instantánea:</strong> Protección y cobertura legal según contrato.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-wifi text-gray-600 text-lg mt-0.5"></i>
+                                <span><strong>Internet Inalámbrico en Capilla:</strong> Para conectividad de acompañantes.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-clipboard-list text-gray-600 text-lg mt-0.5"></i>
+                                <span><strong>Asesoría Integral en Trámites de Defunción:</strong> Orientación legal para certificados e impuestos.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-network-wired text-pabs-blue text-lg mt-0.5"></i>
+                                <span><strong>Cobertura en Red Nacional PABS:</strong> Servicio extensible en recintos afiliados en todo el país.</span>
+                            </li>
+                        </ul>
+
+                        <div class="pt-4 border-t">
+                            <button onclick="seleccionarPlan('Plan Imperial / Básico')" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-montserrat font-bold py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                                <span>Seleccionar Plan Imperial</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table Section -->
+    <section id="comparativa" class="py-16 bg-white border-t border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <h3 class="font-montserrat font-bold text-2xl text-gray-900">Comparativa Directa de Coberturas</h3>
+                <p class="text-gray-500 text-sm mt-1">Detalle exacto según la Cláusula Sexta del Contrato de Previsión Funeraria Tecate.</p>
+            </div>
+
+            <div class="overflow-x-auto shadow-md rounded-xl border border-gray-200">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-pabs-darkblue text-white font-montserrat">
+                            <th class="p-4 w-1/3">Servicio / Cobertura Incluida</th>
+                            <th class="p-4 text-center bg-pabs-blue">PLAN PREMIUM</th>
+                            <th class="p-4 text-center bg-slate-700">PLAN IMPERIAL / BÁSICO</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 bg-white">
+                        <tr class="hover:bg-blue-50/50">
+                            <td class="p-4 font-semibold text-gray-800">Levantamiento y traslado del finado (24h)</td>
+                            <td class="p-4 text-center text-emerald-600"><i class="fa-solid fa-circle-check text-lg"></i> Incluido</td>
+                            <td class="p-4 text-center text-emerald-600"><i class="fa-solid fa-circle-check text-lg"></i> Incluido</td>
+                        </tr>
+                        <tr class="hover:bg-blue-50/50">
+                            <td class="p-4 font-semibold text-gray-800">Tipo de Ataúd Incluido</td>
+                            <td class="p-4 text-center font-bold text-pabs-blue">Madera o Metal Lujo Modelo Premium</td>
+                            <td class="p-4 text-center text-gray-700">Madera o Metálico Modelo Imperial</td>
+                        </tr>
+                        <tr class="hover:bg-blue-50/50">
+                            <td class="p-4 font-semibold text-gray-800">Servicio de Cafetería</td>
+                            <td class="p-4 text-center font-bold text-amber-700 bg-amber-50">Gourmet (Espresso, Capuchino, Brownies, Galletas, Tés)</td>
+                            <td class="p-4 text-center text-gray-600">Tradicional (Café, Galletas, Agua y Refresco)</td>
+                        </tr>
+                        <tr class="hover:bg-blue-50/50">
+                            <td class="p-4 font-semibold text-gray-800">Sesiones de Tanatología en Duelo</td>
+                            <td class="p-4 text-center text-emerald-600 font-bold"><i class="fa-solid fa-circle-check text-lg"></i> Primera Sesión Gratis</td>
+                            <td class="p-4 text-center text-gray-400">Opcional</td>
+                        </tr>
+                        <tr class="hover:bg-blue-50/50">
+                            <td class="p-4 font-semibold text-gray-800">Acompañamiento Musical Religioso en Capilla</td>
+                            <td class="p-4 text-center text-emerald-600"><i class="fa-solid fa-circle-check text-lg"></i> Incluido</td>
+                            <td class="p-4 text-center text-gray-400">Opcional</td>
+                        </tr>
+                        <tr class="hover:bg-blue-50/50">
+                            <td class="p-4 font-semibold text-gray-800">Transmisión Virtual de Velación por Internet</td>
+                            <td class="p-4 text-center text-emerald-600"><i class="fa-solid fa-circle-check text-lg"></i> Incluido</td>
+                            <td class="p-4 text-center text-gray-400">Opcional</td>
+                        </tr>
+                        <tr class="hover:bg-blue-50/50">
+                            <td class="p-4 font-semibold text-gray-800">Seguro por Muerte Accidental Instantánea</td>
+                            <td class="p-4 text-center text-emerald-600 font-bold"><i class="fa-solid fa-shield-halved text-lg"></i> Cubierto</td>
+                            <td class="p-4 text-center text-emerald-600 font-bold"><i class="fa-solid fa-shield-halved text-lg"></i> Cubierto</td>
+                        </tr>
+                        <tr class="hover:bg-blue-50/50">
+                            <td class="p-4 font-semibold text-gray-800">Arreglo Estético y Maquillaje Profesional</td>
+                            <td class="p-4 text-center text-emerald-600"><i class="fa-solid fa-circle-check text-lg"></i> Incluido</td>
+                            <td class="p-4 text-center text-emerald-600"><i class="fa-solid fa-circle-check text-lg"></i> Incluido</td>
+                        </tr>
+                        <tr class="hover:bg-blue-50/50">
+                            <td class="p-4 font-semibold text-gray-800">Cremación Opcional sin Costo Adicional de Servicio</td>
+                            <td class="p-4 text-center text-emerald-600"><i class="fa-solid fa-circle-check text-lg"></i> Incluido</td>
+                            <td class="p-4 text-center text-emerald-600"><i class="fa-solid fa-circle-check text-lg"></i> Incluido</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Value Information & Perpetual Innovation Section -->
+    <section id="beneficios" class="py-20 bg-pabs-lightbg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-12 gap-12 items-center">
+                
+                <div class="lg:col-span-6 space-y-6">
+                    <span class="bg-amber-100 text-amber-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
+                        Garantía de Innovación Continua
+                    </span>
+                    <h2 class="font-montserrat font-extrabold text-3xl sm:text-4xl text-gray-900 leading-tight">
+                        Un Contrato PABS Siempre Estará Al Día con Nuevas Coberturas
+                    </h2>
+                    <p class="text-gray-600 text-base leading-relaxed">
+                        En PABS (Programa de Apoyo de Beneficio Social) mantenemos el compromiso de respaldarte. Cualquier mejora, innovación tecnológica o ampliación de cobertura que se agregue a nuestros planes básico o premium se actualiza de manera automática para tu protección.
+                    </p>
+
+                    <div class="space-y-4 pt-2">
+                        <div class="flex gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                            <div class="w-12 h-12 rounded-full bg-blue-100 text-pabs-blue flex items-center justify-center text-xl shrink-0">
+                                <i class="fa-solid fa-handshake-angle"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-montserrat font-bold text-gray-900 text-base">Beneficio Social 100% Transferible</h4>
+                                <p class="text-xs sm:text-sm text-gray-500 mt-1">El titular puede ceder el servicio a cualquier familiar o persona que lo requiera en el momento oportuno (Cláusula Segunda).</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                            <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shrink-0">
+                                <i class="fa-solid fa-piggy-bank"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-montserrat font-bold text-gray-900 text-base">Precios Congelados Sin Intereses</h4>
+                                <p class="text-xs sm:text-sm text-gray-500 mt-1">Protege a tu familia de la inflación futura. El costo total contratado no cambia ni genera intereses (Cláusula Tercera).</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                            <div class="w-12 h-12 rounded-full bg-red-100 text-pabs-red flex items-center justify-center text-xl shrink-0">
+                                <i class="fa-solid fa-heart-pulse"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-montserrat font-bold text-gray-900 text-base">Cobertura Instantánea Muerte Accidental</h4>
+                                <p class="text-xs sm:text-sm text-gray-500 mt-1">Si el titular fallece accidentalmente, el saldo restante queda condonado automáticamente (Cláusula Cuarta).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Digital Contract Preview / Value Box -->
+                <div class="lg:col-span-6">
+                    <div class="contract-paper p-6 sm:p-8 rounded-2xl relative border-2 border-yellow-300">
+                        <div class="flex items-center justify-between border-b border-amber-300 pb-4 mb-4">
+                            <div class="flex items-center gap-2">
+                                <img src="Logo pabs.webp" alt="PABS" class="h-12 w-auto">
+                                <div>
+                                    <h4 class="font-montserrat font-bold text-xs uppercase text-gray-800">Programa de Apoyo de Beneficio Social</h4>
+                                    <p class="text-[10px] text-gray-600">Servifut de Prevención S.A. de C.V. Tecate B.C.</p>
+                                </div>
+                            </div>
+                            <span class="text-red-700 font-bold text-xs border border-red-300 bg-red-50 px-2 py-1 rounded">
+                                OFICIAL
+                            </span>
+                        </div>
+
+                        <div class="text-xs text-gray-700 space-y-3 font-mono">
+                            <p class="font-bold text-gray-900 uppercase">Extracto de Cláusulas Principales del Contrato:</p>
+                            <p><strong>• Cláusula 2da - Designación de Beneficiario:</strong> "Para los efectos de devolución o uso del servicio, el titular designa a su beneficiario en este contrato."</p>
+                            <p><strong>• Cláusula 4ta - Seguro Muerte Accidental:</strong> "La EMPRESA se compromete a otorgar un seguro por muerte accidental instantánea, quedando automáticamente liquidado el saldo."</p>
+                            <p><strong>• Cláusula 6ta - Prestación de Servicios:</strong> "El servicio funerario se proporcionará las 24 horas del día los 365 días del año."</p>
+                            <p><strong>• Cláusula 9na - Cambio de Urna o Ataúd:</strong> "Si al utilizar el servicio requiere un ataúd de mayor costo, se pagará únicamente la diferencia al momento."</p>
+                        </div>
+
+                        <div class="mt-6 pt-4 border-t border-amber-300 flex justify-between items-center text-xs">
+                            <span class="text-gray-600">Tecate B.C. Módulo Industrial</span>
+                            <span class="font-bold text-pabs-blue">Tel. 665 655 7823</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Digital Application & Form Section with Auto-Fill & Beneficiary -->
+    <section id="solicitud" class="py-20 bg-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    Solicitud Digital Directa
+                </span>
+                <h2 class="font-montserrat font-extrabold text-3xl sm:text-4xl text-gray-900 mt-2">
+                    Solicitud de Contrato de Previsión Funeraria
+                </h2>
+                <p class="text-gray-600 text-sm mt-2">
+                    Ingresa tus datos y los de tu <strong>Beneficiario</strong>. Puedes usar la función de auto-llenado para agilizar el proceso y enviar directamente a WhatsApp o Correo.
+                </p>
+            </div>
+
+            <!-- Main Form Card -->
+            <div class="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+                
+                <!-- Form Header Bar -->
+                <div class="gradient-header text-white p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center gap-4">
+                        <img src="Logo pabs.webp" alt="PABS" class="h-14 w-auto bg-white p-1 rounded-lg">
+                        <div>
+                            <h3 class="font-montserrat font-bold text-lg">REGISTRO DE PREVISIÓN PABS</h3>
+                            <p class="text-xs text-blue-200">Tecate B.C. | Módulo Industrial</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="autollenarDatos()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-montserrat font-bold text-xs px-4 py-2.5 rounded-lg shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Auto-llenar Datos de Prueba</span>
+                    </button>
+                </div>
+
+                <form id="pabsForm" class="p-6 sm:p-10 space-y-8" onsubmit="event.preventDefault();">
+                    
+                    <!-- SECCIÓN 1: DATOS DEL TITULAR -->
+                    <div>
+                        <div class="flex items-center gap-2 border-b pb-2 mb-4">
+                            <span class="w-7 h-7 rounded-full bg-pabs-blue text-white flex items-center justify-center font-bold text-xs">1</span>
+                            <h4 class="font-montserrat font-bold text-gray-900 text-base uppercase">Datos Generales del Titular</h4>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nombre Completo del Titular *</label>
+                                <input type="text" id="titularNombre" required placeholder="Ej. Juan Carlos Pérez Gómez" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pabs-blue focus:border-pabs-blue text-sm transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Teléfono Móvil / WhatsApp *</label>
+                                <input type="tel" id="titularTelefono" required placeholder="Ej. 665 123 4567" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pabs-blue focus:border-pabs-blue text-sm transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Correo Electrónico *</label>
+                                <input type="email" id="titularCorreo" required placeholder="ejemplo@correo.com" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pabs-blue focus:border-pabs-blue text-sm transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Estado Civil / Ciudad</label>
+                                <input type="text" id="titularCiudad" placeholder="Ej. Casado(a) - Tecate, B.C." class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pabs-blue focus:border-pabs-blue text-sm transition">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Domicilio Particular / Dirección Completa</label>
+                                <input type="text" id="titularDireccion" placeholder="Calle, Número, Colonia, C.P., Tecate B.C." class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pabs-blue focus:border-pabs-blue text-sm transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 2: DATOS DEL BENEFICIARIO (REQUERIDO EN CONTRATO) -->
+                    <div class="bg-blue-50/60 p-6 rounded-xl border border-blue-100">
+                        <div class="flex items-center gap-2 border-b border-blue-200 pb-2 mb-4">
+                            <span class="w-7 h-7 rounded-full bg-pabs-red text-white flex items-center justify-center font-bold text-xs">2</span>
+                            <h4 class="font-montserrat font-bold text-gray-900 text-base uppercase">Designación de Beneficiario (Cláusula Segunda)</h4>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nombre del Beneficiario Principal *</label>
+                                <input type="text" id="beneficiarioNombre" required placeholder="Ej. María Elena Pérez Ramírez" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pabs-blue focus:border-pabs-blue text-sm bg-white transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Parentesco / Relación *</label>
+                                <input type="text" id="beneficiarioParentesco" placeholder="Ej. Esposa / Hijo(a) / Hermano(a)" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pabs-blue focus:border-pabs-blue text-sm bg-white transition">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Teléfono de Contacto del Beneficiario</label>
+                                <input type="tel" id="beneficiarioTelefono" placeholder="Ej. 664 987 6543" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pabs-blue focus:border-pabs-blue text-sm bg-white transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 3: SELECCIÓN DE PLAN Y FORMA DE APORTACIÓN -->
+                    <div>
+                        <div class="flex items-center gap-2 border-b pb-2 mb-4">
+                            <span class="w-7 h-7 rounded-full bg-pabs-blue text-white flex items-center justify-center font-bold text-xs">3</span>
+                            <h4 class="font-montserrat font-bold text-gray-900 text-base uppercase">Plan Seleccionado y Modalidad</h4>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Selecciona el Plan *</label>
+                                <select id="planSeleccionado" onchange="actualizarVistaPrevia()" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pabs-blue focus:border-pabs-blue text-sm transition font-semibold">
+                                    <option value="Plan Premium">Plan Premium (Ataúd Lujo + Cafetería Gourmet)</option>
+                                    <option value="Plan Imperial / Básico">Plan Imperial / Básico (Servicio Completo Traditional)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Modalidad de Aportación Preferida</label>
+                                <select id="modalidadPago" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pabs-blue focus:border-pabs-blue text-sm transition">
+                                    <option value="Aportación Semanal / Quincenal">Aportación Semanal / Quincenal</option>
+                                    <option value="Aportación Mensual">Aportación Mensual</option>
+                                    <option value="Pago Único de Contado">Pago Único de Contado (Descuento Especial)</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Comentarios / Dudas Específicas</label>
+                                <textarea id="comentarios" rows="2" placeholder="Notas adicionales o dudas sobre la cobertura..." class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pabs-blue focus:border-pabs-blue text-sm transition"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VISTA PREVIA Y ACCIONES DE ENVÍO -->
+                    <div class="pt-6 border-t space-y-4">
+                        
+                        <div class="bg-slate-900 text-white p-4 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3">
+                            <div>
+                                <span class="text-xs text-slate-400 block uppercase">Destino Directo de la Solicitud:</span>
+                                <span class="text-xs sm:text-sm font-bold text-emerald-400"><i class="fa-brands fa-whatsapp"></i> WhatsApp: 6641601608</span>
+                                <span class="text-xs text-slate-300 ml-2">| <i class="fa-solid fa-envelope"></i> pabsindustrialtecate@gmail.com</span>
+                            </div>
+                            <span class="text-xs bg-blue-500/30 text-blue-200 px-3 py-1 rounded-full border border-blue-400/30">Tecate B.C.</span>
+                        </div>
+
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <!-- Enviar a WhatsApp -->
+                            <button type="button" onclick="enviarWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-montserrat font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm sm:text-base">
+                                <i class="fa-brands fa-whatsapp text-2xl"></i>
+                                <span>Enviar Solicitud por WhatsApp</span>
+                            </button>
+
+                            <!-- Enviar por Email -->
+                            <button type="button" onclick="enviarEmail()" class="w-full bg-pabs-blue hover:bg-pabs-darkblue text-white font-montserrat font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm sm:text-base">
+                                <i class="fa-solid fa-paper-plane text-xl"></i>
+                                <span>Enviar a pabsindustrialtecate@gmail.com</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contacto" class="bg-pabs-darkblue text-white pt-16 pb-8 border-t-4 border-pabs-gold">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-blue-900">
+                
+                <!-- Col 1 -->
+                <div class="space-y-4">
+                    <img src="Logo pabs.webp" alt="PABS Tecate" class="h-16 w-auto bg-white p-1 rounded-lg">
+                    <h4 class="font-montserrat font-bold text-sm uppercase text-pabs-gold">Programa de Apoyo de Beneficio Social</h4>
+                    <p class="text-xs text-blue-200 leading-relaxed">
+                        Servifut de Prevención S.A. de C.V.
+                        Atención funeraria inmediata y contratos de previsión familiar a futuro en Tecate, B.C.
+                    </p>
+                </div>
+
+                <!-- Col 2 -->
+                <div class="space-y-3 text-sm">
+                    <h4 class="font-montserrat font-bold text-base text-white border-b border-blue-800 pb-2">Ubicación y Contacto</h4>
+                    <p class="text-xs text-blue-200"><i class="fa-solid fa-location-dot text-pabs-gold mr-2"></i> Calle 13 N° 1 Int. 4, Col. Espinoza, C.P. 21410, Tecate B.C.</p>
+                    <p class="text-xs text-blue-200"><i class="fa-solid fa-phone text-pabs-gold mr-2"></i> Tel. 24 Hrs: (665) 655-7823 / 654-5457</p>
+                    <p class="text-xs text-blue-200"><i class="fa-brands fa-whatsapp text-emerald-400 mr-2"></i> WhatsApp: 664 160 1608</p>
+                    <p class="text-xs text-blue-200"><i class="fa-solid fa-envelope text-pabs-gold mr-2"></i> pabsindustrialtecate@gmail.com</p>
+                </div>
+
+                <!-- Col 3 -->
+                <div class="space-y-3 text-sm">
+                    <h4 class="font-montserrat font-bold text-base text-white border-b border-blue-800 pb-2">Planes Oficiales</h4>
+                    <ul class="space-y-2 text-xs text-blue-200">
+                        <li><a href="#planes" class="hover:text-pabs-gold transition"><i class="fa-solid fa-angle-right text-pabs-gold mr-1"></i> Plan Premium (Ataúd Lujo + Cafetería Gourmet)</a></li>
+                        <li><a href="#planes" class="hover:text-pabs-gold transition"><i class="fa-solid fa-angle-right text-pabs-gold mr-1"></i> Plan Imperial / Básico</a></li>
+                        <li><a href="#beneficios" class="hover:text-pabs-gold transition"><i class="fa-solid fa-angle-right text-pabs-gold mr-1"></i> Tanatología y Transmisión Virtual</a></li>
+                        <li><a href="#beneficios" class="hover:text-pabs-gold transition"><i class="fa-solid fa-angle-right text-pabs-gold mr-1"></i> Seguro Muerte Accidental Instantánea</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4 -->
+                <div class="space-y-3 text-sm">
+                    <h4 class="font-montserrat font-bold text-base text-white border-b border-blue-800 pb-2">Garantía PABS</h4>
+                    <p class="text-xs text-blue-200 leading-relaxed">
+                        Tus aportaciones congelan el costo total sin cobro de intereses ni caducidad de vigencia. Cobertura nacional integrada en recintos afiliados.
+                    </p>
+                    <div class="pt-2">
+                        <span class="inline-block bg-blue-900 border border-blue-700 text-pabs-gold text-[10px] font-bold px-3 py-1 rounded">
+                            RFC: SPR241031EG6
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="pt-8 text-center text-xs text-blue-300 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p>© 2026 Programa de Apoyo de Beneficio Social (PABS) Tecate, B.C. Todos los derechos reservados.</p>
+                <div class="flex gap-4">
+                    <a href="https://www.pabsmr.org" target="_blank" class="hover:text-white transition">Red Nacional PABS</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Functions for Form Auto-Fill, WhatsApp & Email Integration -->
+    <script>
+        function seleccionarPlan(plan) {
+            document.getElementById('planSeleccionado').value = plan;
+            const solicitudSec = document.getElementById('solicitud');
+            solicitudSec.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function autollenarDatos() {
+            document.getElementById('titularNombre').value = 'Carlos Roberto Mendoza Valdez';
+            document.getElementById('titularTelefono').value = '6651234567';
+            document.getElementById('titularCorreo').value = 'carlos.mendoza.test@gmail.com';
+            document.getElementById('titularCiudad').value = 'Casado - Tecate, B.C.';
+            document.getElementById('titularDireccion').value = 'Av. Revolución #450, Col. Espinoza, Tecate B.C.';
+            
+            document.getElementById('beneficiarioNombre').value = 'Sofía Mendoza Ramírez';
+            document.getElementById('beneficiarioParentesco').value = 'Hija';
+            document.getElementById('beneficiarioTelefono').value = '6649876543';
+            
+            document.getElementById('planSeleccionado').value = 'Plan Premium';
+            document.getElementById('modalidadPago').value = 'Aportación Quincenal';
+            document.getElementById('comentarios').value = 'Solicito cotización exacta y agendar visita del asesor PABS a domicilio.';
+
+            alert('¡Datos de prueba cargados correctamente en el formulario!');
+        }
+
+        function obtenerDatosFormulario() {
+            return {
+                titularNombre: document.getElementById('titularNombre').value.trim(),
+                titularTelefono: document.getElementById('titularTelefono').value.trim(),
+                titularCorreo: document.getElementById('titularCorreo').value.trim(),
+                titularCiudad: document.getElementById('titularCiudad').value.trim(),
+                titularDireccion: document.getElementById('titularDireccion').value.trim(),
+                beneficiarioNombre: document.getElementById('beneficiarioNombre').value.trim(),
+                beneficiarioParentesco: document.getElementById('beneficiarioParentesco').value.trim(),
+                beneficiarioTelefono: document.getElementById('beneficiarioTelefono').value.trim(),
+                planSeleccionado: document.getElementById('planSeleccionado').value,
+                modalidadPago: document.getElementById('modalidadPago').value,
+                comentarios: document.getElementById('comentarios').value.trim()
+            };
+        }
+
+        function validarFormulario(d) {
+            if (!d.titularNombre || !d.titularTelefono || !d.titularCorreo) {
+                alert('Por favor completa los campos requeridos del Titular (Nombre, Teléfono y Correo).');
+                return false;
+            }
+            if (!d.beneficiarioNombre) {
+                alert('Por favor indica el Nombre del Beneficiario (Sección 2).');
+                return false;
+            }
+            return true;
+        }
+
+        function enviarWhatsApp() {
+            const d = obtenerDatosFormulario();
+            if (!validarFormulario(d)) return;
+
+            const mensaje = `*SOLICITUD DE CONTRATO PABS TECATE*%0A` +
+                `----------------------------------------%0A` +
+                `*DATOS DEL TITULAR:*%0A` +
+                `• Nombre: ${encodeURIComponent(d.titularNombre)}%0A` +
+                `• Teléfono: ${encodeURIComponent(d.titularTelefono)}%0A` +
+                `• Correo: ${encodeURIComponent(d.titularCorreo)}%0A` +
+                `• Estado/Ciudad: ${encodeURIComponent(d.titularCiudad || 'Tecate, B.C.')}%0A` +
+                `• Dirección: ${encodeURIComponent(d.titularDireccion || 'No especificada')}%0A%0A` +
+                `*DATOS DEL BENEFICIARIO:*%0A` +
+                `• Beneficiario: ${encodeURIComponent(d.beneficiarioNombre)}%0A` +
+                `• Parentesco: ${encodeURIComponent(d.beneficiarioParentesco || 'No indicado')}%0A` +
+                `• Tel. Beneficiario: ${encodeURIComponent(d.beneficiarioTelefono || 'N/A')}%0A%0A` +
+                `*PLAN Y PAGO:*%0A` +
+                `• Plan Solicitado: *${encodeURIComponent(d.planSeleccionado)}*%0A` +
+                `• Modalidad de Pago: ${encodeURIComponent(d.modalidadPago)}%0A` +
+                (d.comentarios ? `• Comentarios: ${encodeURIComponent(d.comentarios)}%0A` : '') +
+                `----------------------------------------%0A` +
+                `_Solicitado desde el sitio web oficial PABS Tecate_`;
+
+            const numeroWhatsApp = "526641601608";
+            window.open(`https://wa.me/${numeroWhatsApp}?text=${mensaje}`, '_blank');
+        }
+
+        function enviarEmail() {
+            const d = obtenerDatosFormulario();
+            if (!validarFormulario(d)) return;
+
+            const asunto = encodeURIComponent(`Solicitud de Plan ${d.planSeleccionado} - ${d.titularNombre}`);
+            const cuerpo = encodeURIComponent(
+                `SOLICITUD DE CONTRATO DE PREVISIÓN PABS TECATE\n` +
+                `===============================================\n\n` +
+                `DATOS DEL TITULAR:\n` +
+                `------------------\n` +
+                `Nombre: ${d.titularNombre}\n` +
+                `Teléfono: ${d.titularTelefono}\n` +
+                `Correo: ${d.titularCorreo}\n` +
+                `Estado Civil / Ciudad: ${d.titularCiudad || 'Tecate, B.C.'}\n` +
+                `Dirección: ${d.titularDireccion || 'No especificada'}\n\n` +
+                `DESIGNACIÓN DE BENEFICIARIO (Cláusula Segunda):\n` +
+                `------------------------------------------------\n` +
+                `Nombre del Beneficiario: ${d.beneficiarioNombre}\n` +
+                `Parentesco: ${d.beneficiarioParentesco || 'No indicado'}\n` +
+                `Teléfono Beneficiario: ${d.beneficiarioTelefono || 'N/A'}\n\n` +
+                `PLAN Y MODALIDAD SELECCIONADA:\n` +
+                `------------------------------\n` +
+                `Plan: ${d.planSeleccionado}\n` +
+                `Modalidad de Pago: ${d.modalidadPago}\n` +
+                `Comentarios: ${d.comentarios || 'Sin observaciones'}\n\n` +
+                `===============================================\n` +
+                `Enviado a: pabsindustrialtecate@gmail.com\n`
+            );
+
+            window.location.href = `mailto:pabsindustrialtecate@gmail.com?subject=${asunto}&body=${cuerpo}`;
+        }
+    </script>
 </body>
 </html>
-"""
+```eof
 
-# Guardar y generar PDF
-with open("Contratos_PABS_Region_Norte_Editables.html", "w", encoding="utf-8") as f:
-    f.write(html_content)
+He creado una versión completa de la página web inspirada en **PABS (Programa de Apoyo de Beneficio Social)** para Tecate, Baja California.
 
-HTML("Contratos_PABS_Region_Norte_Editables.html").write_pdf("Contratos_PABS_Region_Norte_Editables.pdf")
-print("PDF actualizado generado con éxito.")
+### Novedades y características implementadas:
+1. **Logo Oficial Incorporado:** Se integró la imagen del logo `Logo pabs.webp`.
+2. **Planes Extraídos de los Contratos Reales (Fotografías enviadas):**
+   - **Plan Premium:** Muestra ataúd de lujo madera/metal modelo Premium, servicio de cafetería gourmet exclusiva (espresso, capuchino, brownies, galletas, tés, refrescos), servicio de tanatología sin costo, carroza Premium, transmisión virtual en vivo y acompañamiento musical.
+   - **Plan Imperial / Básico:** Muestra ataúd metálico/madera modelo Imperial, cafetería tradicional, homenaje en capilla con Director Ceremonial y red nacional PABS.
+3. **Sección de Beneficiario (Cláusula Segunda):** Apartado dedicado para capturar el nombre, parentesco y teléfono del beneficiario legal.
+4. **Función Auto-Llenado Días / Prueba:** Botón **"Auto-llenar Datos de Prueba"** para autocompletar la información con un solo clic.
+5. **Envíos Directos:**
+   - **WhatsApp:** Envía todos los datos formateados directamente al número de WhatsApp **6641601608**.
+   - **Correo Electrónico:** Abre la solicitud pre-llenada hacia **pabsindustrialtecate@gmail.com**.
+6. **Innovación y Cobertura Continua:** Sección de valor informando que el contrato siempre estará al día con las nuevas coberturas o innovaciones que se integren al plan básico o premium.
